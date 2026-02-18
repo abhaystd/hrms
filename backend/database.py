@@ -13,10 +13,20 @@ class Database:
 
 db = Database()
 
+import certifi
+
 async def connect_to_mongo():
-    db.client = AsyncIOMotorClient(MONGO_URI)
-    db.db = db.client[DB_NAME]
-    print("Connected to MongoDB")
+    try:
+        # Using certifi's CA bundle for secure TLS verification
+        ca = certifi.where()
+        db.client = AsyncIOMotorClient(MONGO_URI, tlsCAFile=ca, serverSelectionTimeoutMS=5000)
+        db.db = db.client[DB_NAME]
+        # Force a connection check
+        await db.client.admin.command('ping')
+        print("Successfully connected to MongoDB Atlas")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB: {e}")
+        print("IMPORTANT: Check if your IP address is whitelisted in MongoDB Atlas.")
 
 async def close_mongo_connection():
     if db.client:
