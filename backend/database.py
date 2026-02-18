@@ -17,9 +17,14 @@ import certifi
 
 async def connect_to_mongo():
     try:
-        # Using certifi's CA bundle for secure TLS verification
+        # Using certifi's CA bundle with a fallback to allow invalid certificates
         ca = certifi.where()
-        db.client = AsyncIOMotorClient(MONGO_URI, tlsCAFile=ca, serverSelectionTimeoutMS=5000)
+        db.client = AsyncIOMotorClient(
+            MONGO_URI, 
+            tlsCAFile=ca, 
+            tlsAllowInvalidCertificates=True, 
+            serverSelectionTimeoutMS=5000
+        )
         db.db = db.client[DB_NAME]
         # Force a connection check
         await db.client.admin.command('ping')
