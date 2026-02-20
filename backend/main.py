@@ -30,7 +30,7 @@ app.include_router(attendance.router, prefix="/api/attendance", tags=["Attendanc
 async def root():
     return {"message": "Welcome to HRMS Lite API"}
 
-@app.get("/api/health")
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 async def health_check():
     print("Health check endpoint hit!")
     from database import get_database
